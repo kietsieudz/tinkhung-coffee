@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giỏ hàng — TinKhùng Coffee &amp; Tea</title>
+  <meta name="description" content="Giỏ hàng TinKhùng Coffee & Tea — kiểm tra món đã chọn, điều chỉnh số lượng và thanh toán." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="brand-logo">☕</span>
+        <span class="brand-text">
+          <span class="brand-name">TinKhùng</span>
+          <span class="brand-sub">Coffee &amp; Tea</span>
+        </span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Trang chủ</a>
+        <a href="nuoc.html">Nước</a>
+        <a href="do-an.html">Đồ ăn</a>
+        <a href="gio-hang.html" class="active">Giỏ hàng</a>
+      </nav>
+      <a href="gio-hang.html" class="cart-link" title="Giỏ hàng">
+        🛒 <span class="lbl">Giỏ hàng</span>
+        <span class="cart-count" data-cart-count>0</span>
+      </a>
+      <button class="nav-toggle" aria-label="Mở menu">☰</button>
+    </div>
+  </header>
+
+  <section class="cart-wrap container">
+    <h1 class="page-title">🛒 Giỏ hàng của bạn</h1>
+    <p class="page-sub">Kiểm tra lại món, chỉnh số lượng rồi thanh toán nhé.</p>
+    <div id="cartRoot"></div>
+  </section>
+
+  <!-- QR modal -->
+  <div class="modal" id="qrModal">
+    <div class="modal-box">
+      <h3>Quét mã QR thanh toán</h3>
+      <p class="qr-total" id="qrTotal"></p>
+      <canvas id="qrCanvas" width="220" height="220"></canvas>
+      <p class="qr-hint">Mã demo minh họa · mở app ngân hàng để quét</p>
+      <button type="button" class="btn btn-primary" style="width:100%;" onclick="completeOrder()">✅ Đã hoàn thành</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <a href="index.html" class="brand">
+          <span class="brand-logo">☕</span>
+          <span class="brand-text">
+            <span class="brand-name">TinKhùng</span>
+            <span class="brand-sub">Coffee &amp; Tea</span>
+          </span>
+        </a>
+        <p>Quán cà phê &amp; trà nhỏ xinh, nơi mỗi ly nước đều được pha bằng cả tấm lòng.</p>
+        <div class="socials">
+          <a href="#" title="Facebook">📘</a>
+          <a href="#" title="Instagram">📸</a>
+          <a href="#" title="TikTok">🎵</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Liên hệ</h4>
+        <ul>
+          <li>📍 123 Đường Cà Phê, Quận 1, TP.HCM</li>
+          <li>📞 Hotline: 0909 123 456</li>
+          <li>🕖 Mở cửa: 7:00 – 22:00 hằng ngày</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Khám phá</h4>
+        <ul>
+          <li><a href="nuoc.html">Menu Nước</a></li>
+          <li><a href="do-an.html">Menu Đồ Ăn</a></li>
+          <li><a href="gio-hang.html">Giỏ hàng</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 TinKhùng Coffee &amp; Tea · Made with 💛</div>
+  </footer>
+
+  <script src="assets/cart.js"></script>
+  <script>
+    const C = window.TinKhungCart;
+    const root = document.getElementById("cartRoot");
+
+    function render() {
+      const items = C.get();
+      if (!items.length) {
+        root.innerHTML =
+          '<div class="cart-panel"><div class="empty-cart">' +
+            '<div class="big">🫗</div>' +
+            '<h3>Giỏ hàng đang trống trơn</h3>' +
+            '<p>Thêm vài món ngon để bắt đầu nào!</p>' +
+            '<a href="nuoc.html" class="btn btn-primary">👉 Chọn món ngay</a>' +
+          '</div></div>';
+        return;
+      }
+
+      let total = 0;
+      let rows = "";
+      items.forEach(function (it, idx) {
+        const line = it.price * it.qty;
+        total += line;
+        rows +=
+          '<div class="cart-row">' +
+            '<div class="ci-thumb">' + (it.icon || "🍽️") + '</div>' +
+            '<div><div class="ci-name">' + it.name + '</div>' +
+              '<div class="ci-unit">' + C.format(it.price) + ' / món</div></div>' +
+            '<div class="qty-box">' +
+              '<button class="qty-btn" onclick="changeQty(' + idx + ',-1)">−</button>' +
+              '<span>' + it.qty + '</span>' +
+              '<button class="qty-btn" onclick="changeQty(' + idx + ',1)">+</button>' +
+            '</div>' +
+            '<div class="ci-line">' + C.format(line) + '</div>' +
+          '</div>';
+      });
+
+      root.innerHTML =
+        '<div class="cart-panel">' + rows + '</div>' +
+        '<div class="cart-panel cart-summary" style="margin-top:20px;">' +
+          '<div class="summary-line"><span>Tạm tính (' + items.reduce((s,i)=>s+i.qty,0) + ' món)</span><span>' + C.format(total) + '</span></div>' +
+          '<div class="summary-line"><span>Phí giao hàng</span><span style="color:var(--mint);font-weight:700;">Miễn phí</span></div>' +
+          '<div class="summary-total"><span class="lbl">Tổng cộng</span><span class="val">' + C.format(total) + '</span></div>' +
+          '<div class="cart-actions">' +
+            '<button class="btn btn-gold" onclick="showQR(' + total + ')">📱 Thanh toán QR</button>' +
+            '<button class="btn btn-primary" onclick="completeOrder()">✅ Đã thanh toán</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function changeQty(idx, delta) {
+      const items = C.get();
+      if (!items[idx]) return;
+      items[idx].qty += delta;
+      if (items[idx].qty <= 0) items.splice(idx, 1);
+      C.save(items);
+      render();
+    }
+
+    function completeOrder() {
+      document.getElementById("qrModal").classList.remove("open");
+      C.save([]);
+      render();
+    }
+
+    /* ---- QR demo (vẽ hoạ tiết minh hoạ theo số tiền) ---- */
+    function drawFinder(ctx, x, y, cs) {
+      ctx.fillStyle = "#2a1a10"; ctx.fillRect(x, y, cs * 7, cs * 7);
+      ctx.fillStyle = "#fff"; ctx.fillRect(x + cs, y + cs, cs * 5, cs * 5);
+      ctx.fillStyle = "#2a1a10"; ctx.fillRect(x + cs * 2, y + cs * 2, cs * 3, cs * 3);
+    }
+    function drawQR(total) {
+      const cv = document.getElementById("qrCanvas");
+      const ctx = cv.getContext("2d");
+      const size = 21, margin = 16;
+      const cs = Math.floor((cv.width - margin * 2) / size);
+      const off = Math.floor((cv.width - cs * size) / 2);
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+      let seed = (total + 13579) % 2147483647;
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if ((r < 8 && c < 8) || (r < 8 && c >= size - 8) || (r >= size - 8 && c < 8)) continue;
+          seed = (seed * 1664525 + 1013904223) % 4294967296;
+          if ((seed >>> 24) % 2 === 0) {
+            ctx.fillStyle = "#2a1a10";
+            ctx.fillRect(off + c * cs, off + r * cs, cs, cs);
+          }
+        }
+      }
+      drawFinder(ctx, off, off, cs);
+      drawFinder(ctx, off + (size - 7) * cs, off, cs);
+      drawFinder(ctx, off, off + (size - 7) * cs, cs);
+    }
+    function showQR(total) {
+      document.getElementById("qrTotal").textContent = "Số tiền: " + C.format(total);
+      drawQR(total);
+      document.getElementById("qrModal").classList.add("open");
+    }
+
+    document.getElementById("qrModal").addEventListener("click", function (e) {
+      if (e.target.id === "qrModal") this.classList.remove("open");
+    });
+
+    render();
+  </script>
+</body>
+</html>
