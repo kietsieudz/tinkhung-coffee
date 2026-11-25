@@ -11,6 +11,10 @@ Website đặt món (cà phê · trà · đồ ăn) tĩnh, chạy hoàn toàn b�
 ## Thư mục
 - `assets/style.css` — giao diện dùng chung (phong cách quán cà phê ấm cúng)
 - `assets/cart.js` — xử lý giỏ hàng (thêm món, hiệu ứng bay vào giỏ, badge, toast)
+- `assets/img/` — ảnh thật của từng món (JPEG)
+
+## Nguồn ảnh
+Ảnh các món lấy từ **Wikimedia Commons** (giấy phép tự do / Creative Commons). Khi dùng cho mục đích thương mại nên kiểm tra lại giấy phép từng ảnh trên Commons và ghi công tác giả nếu cần. Có thể thay bằng ảnh chụp thật của quán: chép đè file trong `assets/img/` cùng tên.
 
 ## Chạy thử
 Mở `index.html` bằng trình duyệt, hoặc xem bản online qua GitHub Pages.

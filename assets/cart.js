@@ -50,14 +50,15 @@
     setTimeout(function () { btn.classList.remove("bump"); }, 400);
   }
 
-  function flyToCart(originEl, icon) {
+  function flyToCart(originEl, img, icon) {
     const target = document.querySelector(".cart-link");
     if (!originEl || !target) return;
     const s = originEl.getBoundingClientRect();
     const t = target.getBoundingClientRect();
     const flyer = document.createElement("div");
     flyer.className = "flying-item";
-    flyer.textContent = icon;
+    if (img) flyer.style.backgroundImage = "url('" + img + "')";
+    else flyer.textContent = icon || "🍽️";
     flyer.style.left = s.left + (s.width - 70) / 2 + "px";
     flyer.style.top = s.top + (s.height - 70) / 2 + "px";
     document.body.appendChild(flyer);
@@ -72,13 +73,13 @@
     setTimeout(function () { flyer.remove(); }, 720);
   }
 
-  function addItem(name, price, icon, originEl) {
+  function addItem(name, price, img, icon, originEl) {
     const items = getCart();
     const ex = items.find(function (i) { return i.name === name; });
-    if (ex) ex.qty += 1;
-    else items.push({ name: name, price: Number(price), icon: icon, qty: 1 });
+    if (ex) { ex.qty += 1; if (img && !ex.img) ex.img = img; }
+    else items.push({ name: name, price: Number(price), img: img || "", icon: icon || "", qty: 1 });
 
-    if (originEl) flyToCart(originEl, icon);
+    if (originEl) flyToCart(originEl, img, icon);
     setTimeout(function () {
       saveCart(items);
       bumpCart();
@@ -93,12 +94,13 @@
       if (!btn) return;
       const card = btn.closest(".product-card");
       if (!card) return;
-      const thumb = card.querySelector(".thumb");
+      const origin = card.querySelector(".ph img") || card.querySelector(".ph");
       addItem(
         card.dataset.name,
         card.dataset.price,
+        card.dataset.img,
         card.dataset.icon,
-        thumb
+        origin
       );
     });
   }

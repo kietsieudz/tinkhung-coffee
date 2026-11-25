@@ -115,7 +115,7 @@
         total += line;
         rows +=
           '<div class="cart-row">' +
-            '<div class="ci-thumb">' + (it.icon || "🍽️") + '</div>' +
+            '<div class="ci-thumb">' + (it.img ? '<img src="' + it.img + '" alt="' + it.name + '">' : (it.icon || "🍽️")) + '</div>' +
             '<div><div class="ci-name">' + it.name + '</div>' +
               '<div class="ci-unit">' + C.format(it.price) + ' / món</div></div>' +
             '<div class="qty-box">' +
